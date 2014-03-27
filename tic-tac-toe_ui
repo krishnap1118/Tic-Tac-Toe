@@ -1,0 +1,76 @@
+#!C:\Python27
+#this code is based on Python 2.7.5
+#importing TK interface to use Tk widgets
+from Tkinter import *
+import random
+
+# use a class definition to hold all my functions
+class TicApp(Tk):
+    def __init__(tic):
+        """ initialize the frame and widgets"""
+        #load Tk
+        Tk.__init__(tic)
+
+        #make a frame
+        tic_fr = Frame(tic)
+
+        #intializing the buttons and the label
+        tic.player_button = Button(tic, text="User",
+                                    command=lambda: tic.do_start(TRUE),
+                                    font=("Courier", 16))
+        tic.computer_button = Button(tic, text="Computer",
+                                      command=lambda: tic.do_start(FALSE),
+                                      font=("Courier", 16))
+        tic.exit_button = Button(tic, text="Exit", command=tic.do_exit,
+                                  font=("Courier", 16))
+        tic.again_button = Button(tic, text="Try Again", command=tic.do_again,
+                                   state=DISABLED,
+                                   font=("Courier", 16))
+        tic.top_label = Label(tic, text="Please select who starts", font=("Courier", 16))
+
+        #initializing a list to be used for field buttons 
+        tic.button_list = [0,1,2,3,4,5,6,7,8,9]
+
+        #loop to build buttons for playing tic-tac-toe
+        for i in range(1,10):
+            tic.button_list[i] = Button(tic, text="-----",  
+                                   command=lambda j=i: tic.do_button(j),
+                                   state=DISABLED, relief=RAISED, height=4,
+                                   width=8, font=("Courier", 28))
+
+        #setting buttos in frame 
+        tic_fr.grid()
+        tic.top_label.grid(row=0, columnspan=4)
+        tic.player_button.grid(row=1, column=0)
+        tic.computer_button.grid(row=1, column=2)
+        tic.exit_button.grid(row=5, column=0)
+        tic.again_button.grid(row=5, column=2)
+
+        #button number, row, column
+        myL = [[1,4,0], [2,4,1], [3,4,2],  
+               [4,3,0], [5,3,1], [6,3,2],
+               [7,2,0], [8,2,1], [9,2,2]]
+        for i in myL:
+            tic.button_list[i[0]].grid(row=i[1], column=i[2])
+
+    def do_again(tic):
+        """reset everything to play again"""
+        #reset my buttons and change the label
+        tic.player_button.config(state=NORMAL)
+        tic.computer_button.config(state=NORMAL)
+        tic.top_label.config(text="Who starts?")
+
+        #disable the field buttons
+        for i in range(1,10):
+            tic.button_list[i].config(text="---", state=DISABLED)
+            
+    def do_exit(tic):
+        """destroy the frame when exit is pushed"""
+        root.destroy()
+    
+# end of TicApp class
+
+if __name__ == '__main__':
+    root = TicApp()
+    root.title("Tic Tac Toe")
+    root.mainloop()
