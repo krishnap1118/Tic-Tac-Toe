@@ -54,18 +54,91 @@ class TicApp(Tk):
             tic.button_list[i[0]].grid(row=i[1], column=i[2])
 
     def do_again(tic):
-        """reset everything to play again"""
-        #reset my buttons and change the label
+        #reset buttons and change the label
         tic.player_button.config(state=NORMAL)
         tic.computer_button.config(state=NORMAL)
         tic.top_label.config(text="Who starts?")
 
         #disable the field buttons
         for i in range(1,10):
-            tic.button_list[i].config(text="---", state=DISABLED)
+            tic.button_list[i].config(text="-----", state=DISABLED)
+
+    def do_start(tic,player):
+        #turn buttons off
+        tic.player_button.config(state=DISABLED)
+        tic.computer_button.config(state=DISABLED)
+        tic.again_button.config(state=DISABLED)
+
+        #reset the bState and mySums lists and the flags
+        tic.bState = [10,0,0,0,0,0,0,0,0,0]  
+        tic.mySums = [0,0,0,0,0,0,0,0]       
+        tic.gameDone = FALSE
+        tic.specialDefense = FALSE
+
+        #turn the field buttons on
+        for i in range(1,10):
+            tic.button_list[i].config(state=NORMAL)
+
+         #if player is true the player starts otherwise the computer starts
+        tic.top_label.config(text="X belongs to you, make a move")
+        if player:
+            tic.turn = FALSE
+        else:
+            tic.turn = TRUE
+            tic.do_move()
+
+    def do_button(tic, i):
+        #i is the number of the button that was pushed note: 1 through 9
+        # if turn is true the computer made a move otherwie player
+        if tic.turn:
+            myText = "-0-"
+            tic.turn = FALSE
+            tic.bState[i] = -1
+        else:
+            myText = "-X-"
+            tic.turn = TRUE
+            tic.bState[i] = 1
+
+        tic.button_list[i].config(text=myText, state=DISABLED)
+        tic.test_done()
+
+        # if it is the computer's turn and the game is not over make a move
+        if (tic.turn) and (not tic.gameDone):
+            tic.do_move()
+
+    def test_done(tic):
+        """test if the game is over"""
+        #if there is not a 0 in bstate the game is done
+        if not (0 in tic.bState):
+            tic.top_label.config(text="Draw, game over!")
+            tic.gameDone = TRUE
+            tic.again_button.config(state=NORMAL)
+
+        #after doing sums look for 3 or -3 to find if there was a winner
+        tic.do_sums()
+        if 3 in tic.mySums: #note 3 in mySums means player has won
+            tic.top_label.config(text="You won!")
+            tic.gameDone = TRUE
+            tic.again_button.config(state=NORMAL)
+        elif -3 in tic.mySums: #note -3 in mySums means computer has won
+            tic.top_label.config(text="Computer won!")
+            tic.gameDone = TRUE
+            tic.again_button.config(state=NORMAL)
+
+    def do_sums(tic):
+        """put a list of the various row, column, and diagonal sums in mySums"""
+        triples = [[1,2,3], [4,5,6], [7,8,9], #rows
+                   [1,4,7], [2,5,8], [3,6,9], #columns
+                   [1,5,9], [3,5,7]]          #diagonals
+        count = 0
+        for i in triples:
+            tic.mySums[count] = 0
+            for j in i:
+                tic.mySums[count] += tic.bState[j]
+
+            count += 1
             
     def do_exit(tic):
-        """destroy the frame when exit is pushed"""
         root.destroy()
     
 # end of TicApp class
