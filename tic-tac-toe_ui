@@ -137,6 +137,52 @@ class TicApp(Tk):
                 tic.mySums[count] += tic.bState[j]
 
             count += 1
+
+    def do_move(tic):
+        if (not 1 in tic.bState) and (not -1 in tic.bState): #i.e. first move
+            if random.random() < 0.20:   #20% of the time start in center
+                tic.do_button(5)
+                return
+
+        #handle the case where player as made first move to a corner
+        if (1 in tic.bState) and (not -1 in tic.bState):
+            if tic.bState.index(1) in [1,3,7,9]:
+                tic.do_button(5)
+                tic.specialDefense = TRUE
+                return
+
+        #testing and making computer to win 
+        for i in range(1,10):
+            if tic.bState[i] == 0:
+                tic.bState[i] = -1  
+                tic.do_sums()
+                if -3 in tic.mySums: 
+                    tic.do_button(i)
+                    return
+                else:
+                    tic.bState[i] = 0 
+
+        #testing and blocking player
+        for i in range(1,10):
+            if tic.bState[i] == 0:
+                tic.bState[i] = 1   #make a trial move
+                tic.do_sums()
+                if 3 in tic.mySums: #note 3 in bState means player has won
+                    tic.do_button(i) #block if player could win
+                    tic.specialDefense = FALSE #special defense no longer needed
+                    return
+                else:
+                    tic.bState[i] = 0 #switch back of not a win
+
+        #for the second special defense move, pick a side (if not already done)
+        if tic.specialDefense:
+            tic.specialDefense = FALSE
+            sides = [2,4,6,8]
+            random.shuffle(sides)  #shuffle them so people don't get as bored
+            for i in sides:
+                if tic.bState[i] == 0:
+                    tic.do_button(i)
+                    return
             
     def do_exit(tic):
         root.destroy()
